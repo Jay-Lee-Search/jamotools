@@ -139,9 +139,23 @@ def split_syllable_char(syllable, jamo_type='JAMO'):
         result_jungseong = JAMO_JUNGSEONG[jungseong_index]
         result_jongseong = JAMO_JONGSEONG[jongseong_index - 1]
     elif jamo_type=='COMPAT':
-        result_choseong = COMPAT_CHOSEONG[choseong_index]
-        result_jungseong = COMPAT_JUNGSEONG[jungseong_index]
-        result_jongseong = COMPAT_JONGSEONG[jongseong_index - 1]
+        if choseong_index in COMPAT_DOUBLE_CHOSEONG:
+            idxs = COMPAT_DOUBLE_CHOSEONG[choseong_index]
+            result_choseong = COMPAT_CHOSEONG[idxs[0]]+COMPAT_CHOSEONG[idxs[1]]
+        else:
+            result_choseong = COMPAT_CHOSEONG[choseong_index]
+
+        if jungseong_index in COMPAT_DOUBLE_JUNGSEONG:
+            idxs = COMPAT_DOUBLE_JUNGSEONG[jungseong_index]
+            result_jungseong = COMPAT_JUNGSEONG[idxs[0]]+COMPAT_JUNGSEONG[idxs[1]]
+        else:
+            result_jungseong = COMPAT_JUNGSEONG[jungseong_index]
+        
+        if jongseong_index - 1 in COMPAT_DOUBLE_JONGSEONG:
+            idxs = COMPAT_DOUBLE_JONGSEONG[jongseong_index - 1]
+            result_jongseong = COMPAT_JONGSEONG[idxs[0]]+COMPAT_JONGSEONG[idxs[1]]    
+        else:
+            result_jongseong = COMPAT_JONGSEONG[jongseong_index - 1]
     else:
         result_choseong = HALFWIDTH_CHOSEONG[choseong_index]
         result_jungseong = HALFWIDTH_JUNGSEONG[jungseong_index]
@@ -151,9 +165,13 @@ def split_syllable_char(syllable, jamo_type='JAMO'):
         result = (result_choseong, result_jungseong)
     else:
         result = (result_choseong, result_jungseong, result_jongseong)
-
+    
     return result
 
+COMPAT_DOUBLE_CHOSEONG = {1:(0,0),4:(3,3),8:(7,7),10:(9,9),13:(12,12)}
+COMPAT_DOUBLE_JUNGSEONG = {9:(8,0),10:(8,1),11:(8,20),14:(13,4),15:(13,5),16:(13,20),19:(18,20)}
+COMPAT_DOUBLE_JONGSEONG = {1:(0,0),2:(0,18),4:(3,21),5:(3,26),8:(7,0),9:(7,15),10:(7,16),11:(7,18),12:(7,24),13:(7,25),14:(7,26),17:
+(16,18),19:(18,18)}
 
 def join_jamos_char(choseong, jungseong, jongseong=None):
     """Combines jamos to produce a single syllable.
